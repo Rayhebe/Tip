@@ -9,7 +9,7 @@ from highrise.__main__ import *
 bot_file_name = "main"
 bot_class_name = "bot"
 room_id = "66bad059afeca0c24b497205"
-bot_token = "6e6e5ac1f8c9fb0f917386e592d6ce3188538e1c15ccf4188079173cb72bf447"
+bot_token = "e6afc2ed8cbe059baa1c4420661e6b385e0d37c09a7697d2a6360e688fc636f7"
 
 my_bot = BotDefinition(getattr(import_module(bot_file_name), bot_class_name)(), room_id, bot_token)
 
