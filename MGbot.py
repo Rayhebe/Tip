@@ -6,7 +6,7 @@ from pickuplines import PUL
 import time
 
 
-class xenoichi(BaseBot):
+class MGbot(BaseBot):
     def __init__(self):
         super().__init__()
 
