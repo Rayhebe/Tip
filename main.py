@@ -1219,6 +1219,60 @@ class Bot(BaseBot):
         parts = message.split(" ")
         command = parts[0][1:]  # Get the command after the prefix (!)
 
+    # Heart reaction handling
+    if command.startswith("heart"):
+        # Heart@user.id (single reaction)
+        if len(parts) == 2 and "@" in parts[1]:
+            target_username = parts[1][1:]  # Remove '@'
+            target_user_id = await self.get_user_id(target_username)
+            if target_user_id:
+                await self.highrise.react("heart", target_user_id)
+                await self.highrise.chat(f"Sent a heart to {target_username}")
+            else:
+                await self.highrise.chat("User not found.")
+        # !heart@user.id 30 (mod or special user sends multiple reactions)
+        elif len(parts) == 3 and user.username in mods + ["RayMG", "sh1n1gam1699"]:
+            target_username = parts[1][1:]
+            target_user_id = await self.get_user_id(target_username)
+            amount = int(parts[2])
+
+            if target_user_id and amount <= 30:
+                for _ in range(amount):
+                    await self.highrise.react("heart", target_user_id)
+                await self.highrise.chat(f"Sent {amount} hearts to {target_username}")
+            else:
+                await self.highrise.chat("Invalid amount or user not found.")
+        else:
+            await self.highrise.chat("Usage: !heart@user.id or !heart@user.id [1-30]")
+
+    # Clap reaction handling
+    elif command.startswith("clap"):
+        # Clap@user.id (single reaction)
+        if len(parts) == 2 and "@" in parts[1]:
+            target_username = parts[1][1:]  # Remove '@'
+            target_user_id = await self.get_user_id(target_username)
+            if target_user_id:
+                await self.highrise.react("clap", target_user_id)
+                await self.highrise.chat(f"Sent a clap to {target_username}")
+            else:
+                await self.highrise.chat("User not found.")
+        # !clap@user.id 30 (mod or special user sends multiple reactions)
+        elif len(parts) == 3 and user.username in mods + ["RayMG", "sh1n1gam1699"]:
+            target_username = parts[1][1:]
+            target_user_id = await self.get_user_id(target_username)
+            amount = int(parts[2])
+
+            if target_user_id and amount <= 30:
+                for _ in range(amount):
+                    await self.highrise.react("clap", target_user_id)
+                await self.highrise.chat(f"Sent {amount} claps to {target_username}")
+            else:
+                await self.highrise.chat("Invalid amount or user not found.")
+        else:
+            await self.highrise.chat("Usage: !clap@user.id or !clap@user.id [1-30]")
+
+    # ... (rest of your command handling code) 
+
         # If the user is a mod, allow all mod commands
         if user.username in mods:
             if command == "mod" and len(parts) == 2:
