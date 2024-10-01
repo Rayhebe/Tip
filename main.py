@@ -2,8 +2,16 @@ import random
 from highrise import BaseBot, User, Position
 from highrise.models import SessionMetadata
 from functions.mod import kick_user, ban_user, mute_user, summon_user
+from functions.chat_commands import ChatCommands  # Import the ChatCommands class
+
+casa = [
+    "I Marry You 💍", "Of course I do 💍❤️", "I don't want to 💍💔",
+    "Of course I don't 💍💔", "I Love You Of course I marry you 💍"
+]
 
 class Bot(BaseBot):
+    bot_name = "MGBot"  # Define the bot name
+
     async def on_start(self, session_metadata: SessionMetadata) -> None:
         print("working")
         await self.highrise.walk_to(Position(4.0, 0.26, 3.5, "FrontRight"))
@@ -18,8 +26,7 @@ class Bot(BaseBot):
 
         # Check if the message is a whisper from RayMG or sh1n1gam1699
         if user.username in ['RayMG', 'sh1n1gam1699'] and message.startswith("/whisper"):
-            broadcast_message = message[len("/whisper "):]  # Get the message after the command
-            await self.highrise.chat(f"{self.bot_name}: {broadcast_message}")  # Send the broadcasted message
+            await ChatCommands.handle_whisper(self, user, message)  # Call the whisper handler
             return
 
         # Heart reaction logic
