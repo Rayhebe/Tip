@@ -4,6 +4,7 @@ import importlib.util
 from highrise import*
 from highrise import BaseBot,Position
 from highrise.models import SessionMetadata
+from functions.chat_commands import handle_direct_message
 
 casa = ["I Marry You 💍","Of course I do 💍❤️","I don't want to 💍💔","Of course I don't 💍💔","I Love You Of course I marry you 💍"]
 
@@ -34,23 +35,20 @@ class Bot(BaseBot):
         await self.highrise.send_emote("dance-hipshake")
       
         await self.highrise.send_emote("emote-lust",user.id) 
-      
-from functions.chat_commands import handle_direct_message
 
     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")
 
         # Check for direct message commands
-        if message.lower().startswith("@mgbot"):
-            # Remove the @mgbot prefix and handle the message
+        if message.lower().startswith("@mgbot"):  # Check if the message starts with @mgbot
             command = message[7:].strip()  # Get command after @mgbot
-            await handle_direct_message(self, user, command)
+            await handle_direct_message(self, user, command)  # Call the direct message handler
+        else:
+            # Handle other chat messages if necessary
+            pass
 
 # Create an instance of your bot
 bot = Bot()
-
-             
-
         if message.lower().startswith("-tipall ") and user.username == "RayMG":
               parts = message.split(" ")
               if len(parts) != 2:
