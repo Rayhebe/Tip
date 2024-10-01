@@ -1219,21 +1219,66 @@ class Bot(BaseBot):
         parts = message.split(" ")
         command = parts[0][1:]  # Get the command after the prefix (!)
 
+    # If the user is a mod, allow all mod commands
+    if user.username in mods:
+        if command == "mod" and len(parts) == 2:
+            target_user_id = parts[1]
+            target_username = (await self.get_username_by_id(target_user_id))
+            response = await grant_mod(target_user_id, target_username)
+            await self.highrise.chat(response)
+        
+        elif command == "kick" and len(parts) == 2:
+            target_user_id = parts[1]
+            await self.kick_user(user, target_user_id)
+        
+        elif command == "ban" and len(parts) == 2:
+            target_user_id = parts[1]
+            await self.ban_user(user, target_user_id)
+        
+        elif command == "mute" and len(parts) == 2:
+            target_user_id = parts[1]
+            await self.mute_user(user, target_user_id)
+
+        elif command == "summon" and len(parts) == 2:
+            target_user_id = parts[1]
+            await self.summon_user(user, target_user_id)
+
+        elif command == "vip" and len(parts) == 2:
+            target_user_id = parts[1]
+            target_username = (await self.get_username_by_id(target_user_id))
+            response = await grant_vip(target_user_id, target_username)
+            await self.highrise.chat(response)
+
+        elif command == "vipremove" and len(parts) == 2:
+            target_user_id = parts[1]
+            target_username = (await self.get_username_by_id(target_user_id))
+            response = await remove_vip(target_user_id, target_username)
+            await self.highrise.chat(response)
+
+    # If the user is a VIP, allow only the summon command
+    elif user.username in vips:
+        if command == "summon" and len(parts) == 2:
+            target_user_id = parts[1]
+            await self.summon_user(user, target_user_id)
+        else:
+            await self.highrise.chat(f"Sorry, {user.username}, you do not have permission to use this command.")
+
+    else:
+        await self.highrise.chat(f"Sorry, {user.username}, you do not have permission to use this command.")
+
     # Heart reaction handling
     if command.startswith("heart"):
-        # Heart@user.id (single reaction)
         if len(parts) == 2 and "@" in parts[1]:
             target_username = parts[1][1:]  # Remove '@'
-            target_user_id = await self.get_user_id(target_username)
+            target_user_id = await get_user_id(self.highrise, target_username)
             if target_user_id:
                 await self.highrise.react("heart", target_user_id)
                 await self.highrise.chat(f"Sent a heart to {target_username}")
             else:
                 await self.highrise.chat("User not found.")
-        # !heart@user.id 30 (mod or special user sends multiple reactions)
         elif len(parts) == 3 and user.username in mods + ["RayMG", "sh1n1gam1699"]:
             target_username = parts[1][1:]
-            target_user_id = await self.get_user_id(target_username)
+            target_user_id = await get_user_id(self.highrise, target_username)
             amount = int(parts[2])
 
             if target_user_id and amount <= 30:
@@ -1247,19 +1292,17 @@ class Bot(BaseBot):
 
     # Clap reaction handling
     elif command.startswith("clap"):
-        # Clap@user.id (single reaction)
         if len(parts) == 2 and "@" in parts[1]:
             target_username = parts[1][1:]  # Remove '@'
-            target_user_id = await self.get_user_id(target_username)
+            target_user_id = await get_user_id(self.highrise, target_username)
             if target_user_id:
                 await self.highrise.react("clap", target_user_id)
                 await self.highrise.chat(f"Sent a clap to {target_username}")
             else:
                 await self.highrise.chat("User not found.")
-        # !clap@user.id 30 (mod or special user sends multiple reactions)
         elif len(parts) == 3 and user.username in mods + ["RayMG", "sh1n1gam1699"]:
             target_username = parts[1][1:]
-            target_user_id = await self.get_user_id(target_username)
+            target_user_id = await get_user_id(self.highrise, target_username)
             amount = int(parts[2])
 
             if target_user_id and amount <= 30:
@@ -1270,79 +1313,6 @@ class Bot(BaseBot):
                 await self.highrise.chat("Invalid amount or user not found.")
         else:
             await self.highrise.chat("Usage: !clap@user.id or !clap@user.id [1-30]")
-
-    # ... (rest of your command handling code) 
-
-        # If the user is a mod, allow all mod commands
-        if user.username in mods:
-            if command == "mod" and len(parts) == 2:
-                target_user_id = parts[1]
-                target_username = (await self.get_username_by_id(target_user_id))
-                response = await grant_mod(target_user_id, target_username)
-                await self.highrise.chat(response)
-            
-            elif command == "kick" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.kick_user(user, target_user_id)
-            
-            elif command == "ban" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.ban_user(user, target_user_id)
-            
-            elif command == "mute" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.mute_user(user, target_user_id)
-
-            elif command == "summon" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.summon_user(user, target_user_id)
-
-            elif command == "vip" and len(parts) == 2:
-                target_user_id = parts[1]
-                target_username = (await self.get_username_by_id(target_user_id))
-                response = await grant_vip(target_user_id, target_username)
-                await self.highrise.chat(response)
-
-            elif command == "vipremove" and len(parts) == 2:
-                target_user_id = parts[1]
-                target_username = (await self.get_username_by_id(target_user_id))
-                response = await remove_vip(target_user_id, target_username)
-                await self.highrise.chat(response)
-
-        # If the user is a VIP, allow only the summon command
-        elif user.username in vips:
-            if command == "summon" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.summon_user(user, target_user_id)
-            else:
-                await self.highrise.chat(f"Sorry, {user.username}, you do not have permission to use this command.")
-
-        else:
-            await self.highrise.chat(f"Sorry, {user.username}, you do not have permission to use this command.")
-
-    async def get_username_by_id(self, user_id: str) -> str:
-        """Retrieve the username based on the user ID"""
-        room_users = (await self.highrise.get_room_users()).content
-        for room_user, pos in room_users:
-            if room_user.id == user_id:
-                return room_user.username
-        return None
-
-    async def kick_user(self, user: User, target_user_id: str):
-        try:
-            await self.highrise.moderate_room(target_user_id, "kick")
-            target_username = await self.get_username_by_id(target_user_id)
-            await self.highrise.chat(f"{target_username} has been kicked from the room!")
-        except Exception as e:
-            await self.highrise.chat(f"Error while kicking: {e}")
-
-    async def ban_user(self, user: User, target_user_id: str):
-        try:
-            await self.highrise.moderate_room(target_user_id, "ban")
-            target_username = await self.get_username_by_id(target_user_id)
-            await self.highrise.chat(f"{target_username} has been banned from the room!")
-        except Exception as e:
-            await self.highrise.chat(f"Error while banning: {e}")
 
     async def mute_user(self, user: User, target_user_id: str):
         # Mute logic to be implemented, or replace with existing mute logic
