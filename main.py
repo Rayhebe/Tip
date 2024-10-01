@@ -1216,16 +1216,6 @@ class Bot(BaseBot):
         await self.highrise.teleport(user_id = user_id, dest = Position(float(x), float(y), float(z)))
 
     async def command_handler(self, user: User, message: str):
-# main.py
-
-from functions.mod import mods, vips, grant_mod, grant_vip, remove_vip
-from highrise import User, Position
-
-class MGBot:
-    def __init__(self, highrise):
-        self.highrise = highrise
-
-    async def command_handler(self, user: User, message: str):
         parts = message.split(" ")
         command = parts[0][1:]  # Get the command after the prefix (!)
 
