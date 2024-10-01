@@ -50,7 +50,7 @@ class Bot(BaseBot):
 # Create an instance of your bot
 bot = Bot()
 
-    async def on_chat(self, user: User, message: str) -> None:
+     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")  
              
         if message.lower().startswith("-tipall ") and user.username == "RayMG":
