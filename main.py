@@ -3,11 +3,6 @@ from highrise import BaseBot, User, Position
 from highrise.models import SessionMetadata
 from functions.mod import kick_user, ban_user, mute_user, summon_user
 
-casa = [
-    "I Marry You 💍", "Of course I do 💍❤️", "I don't want to 💍💔",
-    "Of course I don't 💍💔", "I Love You Of course I marry you 💍"
-]
-
 class Bot(BaseBot):
     async def on_start(self, session_metadata: SessionMetadata) -> None:
         print("working")
@@ -20,6 +15,12 @@ class Bot(BaseBot):
 
     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")
+
+        # Check if the message is a whisper from RayMG or sh1n1gam1699
+        if user.username in ['RayMG', 'sh1n1gam1699'] and message.startswith("/whisper"):
+            broadcast_message = message[len("/whisper "):]  # Get the message after the command
+            await self.highrise.chat(f"{self.bot_name}: {broadcast_message}")  # Send the broadcasted message
+            return
 
         # Heart reaction logic
         if message.lower().startswith("heart"):
@@ -74,15 +75,6 @@ class Bot(BaseBot):
         if len(parts[1].split(" ")) > 1:  # If a number of hearts is specified
             try:
                 num_hearts = int(parts[1].split(" ")[1].strip())
-                # Limit the number of hearts sent by specific users
-                if user.username in ['RayMG', 'sh1n1gam1699']:
-                    if num_hearts > 20:
-                        await self.highrise.chat("You can only send up to 20 hearts.")
-                        return
-                else:
-                    if num_hearts > 1:
-                        await self.highrise.chat("You can only send 1 heart.")
-                        return
             except ValueError:
                 await self.highrise.chat("Invalid number of hearts.")
                 return
@@ -113,15 +105,6 @@ class Bot(BaseBot):
         if len(parts[1].split(" ")) > 1:  # If a number of claps is specified
             try:
                 num_claps = int(parts[1].split(" ")[1].strip())
-                # Limit the number of claps sent by specific users
-                if user.username in ['RayMG', 'sh1n1gam1699']:
-                    if num_claps > 20:
-                        await self.highrise.chat("You can only send up to 20 claps.")
-                        return
-                else:
-                    if num_claps > 1:
-                        await self.highrise.chat("You can only send 1 clap.")
-                        return
             except ValueError:
                 await self.highrise.chat("Invalid number of claps.")
                 return
