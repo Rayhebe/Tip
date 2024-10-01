@@ -2,31 +2,31 @@ import random
 from highrise import BaseBot, User, Position
 from highrise.models import SessionMetadata
 from functions.mod import kick_user, ban_user, mute_user, summon_user
-from functions.chat_commands import ChatCommands  # Import the ChatCommands class
-
-casa = [
-    "I Marry You 💍", "Of course I do 💍❤️", "I don't want to 💍💔",
-    "Of course I don't 💍💔", "I Love You Of course I marry you 💍"
-]
 
 class Bot(BaseBot):
-    bot_name = "MGBot"  # Define the bot name
-
     async def on_start(self, session_metadata: SessionMetadata) -> None:
-        print("working")
+        print("Bot is active")
         await self.highrise.walk_to(Position(4.0, 0.26, 3.5, "FrontRight"))
 
     async def on_user_join(self, user: User, position: Position) -> None:
-        print(f"{user.username} entrou na sala")
+        print(f"{user.username} joined the room")
         await self.highrise.send_emote("dance-hipshake")
         await self.highrise.send_emote("emote-lust", user.id)
 
     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")
 
-        # Check if the message is a whisper from RayMG or sh1n1gam1699
-        if user.username in ['RayMG', 'sh1n1gam1699'] and message.startswith("/whisper"):
-            await ChatCommands.handle_whisper(self, user, message)  # Call the whisper handler
+        # Check for whisper to the bot
+        if message.startswith("/whisper") and user.username in ['RayMG', 'sh1n1gam1699']:
+            # Extract the message after the command
+            whispered_message = message[len("/whisper "):].strip()
+            await self.highrise.chat(whispered_message)  # Send the message as public chat
+            return
+
+        # Check for commands prefixed with @MGBot
+        if message.startswith("@MGBot"):
+            command_message = message[len("@MGBot "):].strip()
+            await self.highrise.chat(command_message)  # Send the command message as public chat
             return
 
         # Heart reaction logic
@@ -46,7 +46,7 @@ class Bot(BaseBot):
                 await self.clap_for_user(user, parts)
 
         # Moderation commands for mods
-        if user.username in ['RayMG', 'sh1n1gam1699', 'mod']:  # Adjust the mod list as needed
+        if user.username in ['RayMG', 'sh1n1gam1699', 'mod']:
             if message.startswith("!kick "):
                 parts = message.split(" ")
                 if len(parts) == 2:
@@ -76,10 +76,10 @@ class Bot(BaseBot):
             await self.highrise.react("heart", target.id)
 
     async def heart_for_user(self, user: User, parts: list) -> None:
-        target_username = parts[1].split(" ")[0].strip()  # Get the target username
-        num_hearts = 1  # Default to 1 heart
+        target_username = parts[1].split(" ")[0].strip()
+        num_hearts = 1
 
-        if len(parts[1].split(" ")) > 1:  # If a number of hearts is specified
+        if len(parts[1].split(" ")) > 1:
             try:
                 num_hearts = int(parts[1].split(" ")[1].strip())
             except ValueError:
@@ -89,7 +89,6 @@ class Bot(BaseBot):
         room_users = await self.highrise.get_room_users()
         target_user = None
 
-        # Find the specified user in the room
         for room_user, _ in room_users.content:
             if room_user.username.lower() == target_username.lower():
                 target_user = room_user
@@ -106,10 +105,10 @@ class Bot(BaseBot):
             await self.highrise.react("clap", target.id)
 
     async def clap_for_user(self, user: User, parts: list) -> None:
-        target_username = parts[1].split(" ")[0].strip()  # Get the target username
-        num_claps = 1  # Default to 1 clap
+        target_username = parts[1].split(" ")[0].strip()
+        num_claps = 1
 
-        if len(parts[1].split(" ")) > 1:  # If a number of claps is specified
+        if len(parts[1].split(" ")) > 1:
             try:
                 num_claps = int(parts[1].split(" ")[1].strip())
             except ValueError:
@@ -119,7 +118,6 @@ class Bot(BaseBot):
         room_users = await self.highrise.get_room_users()
         target_user = None
 
-        # Find the specified user in the room
         for room_user, _ in room_users.content:
             if room_user.username.lower() == target_username.lower():
                 target_user = room_user
