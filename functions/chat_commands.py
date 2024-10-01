@@ -1,6 +1,11 @@
-from highrise import BaseBot, User
+# functions/chat_commands.py
 
-async def handle_direct_message(bot: BaseBot, user: User, command: str) -> None:
+async def handle_direct_message(bot, user, command):
+    """
+    This function handles direct messages sent to the bot.
+    """
+    # Example: Bot will say the command publicly in the room
     if command:
-        # Display the user's command in the public chat
-        await bot.highrise.chat(command)  # Send the command as a public message
+        await bot.highrise.send_room_message(command)
+    else:
+        await bot.highrise.send_whisper(user.id, "I didn't understand the command.")
