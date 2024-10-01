@@ -36,6 +36,7 @@ class Bot(BaseBot):
         await self.highrise.send_emote("emote-lust",user.id) 
       
 from functions.chat_commands import handle_direct_message
+
     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")
 
