@@ -1,22 +1,23 @@
+import random
 from highrise import BaseBot, User, Position
 from highrise.models import SessionMetadata
 
 class Bot(BaseBot):
     async def on_start(self, session_metadata: SessionMetadata) -> None:
-        print("Bot is online.")
+        print("Bot is running")
         await self.highrise.walk_to(Position(4.0, 0.26, 3.5, "FrontRight"))
 
+    async def on_user_join(self, user: User, position: Position) -> None:
+        print(f"{user.username} joined the room")
+        await self.highrise.send_emote("dance-hipshake")
+
     async def on_chat(self, user: User, message: str) -> None:
-        # Ignore messages from the bot itself
-        if user.username == "MGBot":
-            return
+        print(f"{user.username}: {message}")
 
-        # Check for direct message to the bot
-        if message.startswith("@MGBot "):
-            # Extract the message after @MGBot
-            direct_message = message[len("@MGBot "):].strip()
-            if direct_message:  # Ensure there is a message to send
-                await self.highrise.chat(direct_message)  # Display the message in public
-            return  # Exit the function to avoid further processing
-
-# Create an instance of the bot class and run it
+        # Check for direct message command
+        if message.lower().startswith("@mgbot"):
+            command_message = message[7:].strip()  # Remove the command prefix
+            if command_message:  # Ensure there's something to respond with
+                await self.highrise.chat(command_message)  # Broadcast the message to the room
+            else:
+                await self.highrise.chat("Please provide a message after @MGBot.")
