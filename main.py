@@ -74,6 +74,15 @@ class Bot(BaseBot):
         if len(parts[1].split(" ")) > 1:  # If a number of hearts is specified
             try:
                 num_hearts = int(parts[1].split(" ")[1].strip())
+                # Limit the number of hearts sent by specific users
+                if user.username in ['RayMG', 'sh1n1gam1699']:
+                    if num_hearts > 20:
+                        await self.highrise.chat("You can only send up to 20 hearts.")
+                        return
+                else:
+                    if num_hearts > 1:
+                        await self.highrise.chat("You can only send 1 heart.")
+                        return
             except ValueError:
                 await self.highrise.chat("Invalid number of hearts.")
                 return
@@ -104,6 +113,15 @@ class Bot(BaseBot):
         if len(parts[1].split(" ")) > 1:  # If a number of claps is specified
             try:
                 num_claps = int(parts[1].split(" ")[1].strip())
+                # Limit the number of claps sent by specific users
+                if user.username in ['RayMG', 'sh1n1gam1699']:
+                    if num_claps > 20:
+                        await self.highrise.chat("You can only send up to 20 claps.")
+                        return
+                else:
+                    if num_claps > 1:
+                        await self.highrise.chat("You can only send 1 clap.")
+                        return
             except ValueError:
                 await self.highrise.chat("Invalid number of claps.")
                 return
