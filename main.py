@@ -4,6 +4,7 @@ import importlib.util
 from highrise import*
 from highrise import BaseBot,Position
 from highrise.models import SessionMetadata
+from functions.chat_commands import handle_direct_message
 
 casa = ["I Marry You 💍","Of course I do 💍❤️","I don't want to 💍💔","Of course I don't 💍💔","I Love You Of course I marry you 💍"]
 
@@ -153,6 +154,17 @@ class Bot(BaseBot):
                     await self.highrise.chat(f"You have been tipped {amount_str}.")
                 except (IndexError, ValueError):
                     await self.highrise.chat("Invalid tip amount. Please specify a valid number.")
+        
+        # Debugging: Check if message is received
+        if message.lower().startswith("@mgbot"):
+            print("Direct message received!")  # Debug line
+            command = message[7:].strip()  # Get command after @mgbot
+            await handle_direct_message(self, user, command)  # Handle the message
+        else:
+            print("Message did not start with @mgbot.")
+
+# Create an instance of your bot
+bot = Bot()     
                     
         if message.startswith("/fish"):
             await self.highrise.send_whisper(user.id,"fish 🎣...")
