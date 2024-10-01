@@ -34,6 +34,21 @@ class Bot(BaseBot):
         await self.highrise.send_emote("dance-hipshake")
       
         await self.highrise.send_emote("emote-lust",user.id) 
+
+    async def on_chat(self, user: User, message: str) -> None:
+        print(f"{user.username}: {message}")
+        
+        # Debugging: Check if message is received
+        if message.lower().startswith("@mgbot"):
+            print("Direct message received!")  # Debug line
+            command = message[7:].strip()  # Get command after @mgbot
+            await handle_direct_message(self, user, command)  # Handle the message
+        else:
+            print("Message did not start with @mgbot.")
+
+# Create an instance of your bot
+bot = Bot()
+         
       
     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")  
