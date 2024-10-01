@@ -38,6 +38,17 @@ class Bot(BaseBot):
       
     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")  
+                     
+        # Debugging: Check if message is received
+        if message.lower().startswith("@mgbot"):
+            print("Direct message received!")  # Debug line
+            command = message[7:].strip()  # Get command after @mgbot
+            await handle_direct_message(self, user, command)  # Handle the message
+        else:
+            print("Message did not start with @mgbot.")
+
+# Create an instance of your bot
+bot = Bot()     
 
         if message.lower().startswith("-tipall ") and user.username == "RayMG":
               parts = message.split(" ")
@@ -154,17 +165,6 @@ class Bot(BaseBot):
                     await self.highrise.chat(f"You have been tipped {amount_str}.")
                 except (IndexError, ValueError):
                     await self.highrise.chat("Invalid tip amount. Please specify a valid number.")
-        
-        # Debugging: Check if message is received
-        if message.lower().startswith("@mgbot"):
-            print("Direct message received!")  # Debug line
-            command = message[7:].strip()  # Get command after @mgbot
-            await handle_direct_message(self, user, command)  # Handle the message
-        else:
-            print("Message did not start with @mgbot.")
-
-# Create an instance of your bot
-bot = Bot()     
                     
         if message.startswith("/fish"):
             await self.highrise.send_whisper(user.id,"fish 🎣...")
