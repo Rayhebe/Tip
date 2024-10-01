@@ -1,9 +1,9 @@
 # functions/chat_commands.py
 
-async def whisper(bot, user, message: str) -> None:
-    # This function could be extended for different whisper handling
-    await bot.highrise.chat(message)
+# Currently, no additional command functions are needed.
+# This file can be expanded later for other chat commands.
 
-async def direct_message(bot, user, message: str) -> None:
-    # This function could handle direct messages differently if needed
-    await bot.highrise.chat(message)
+async def handle_direct_message(bot, user, message):
+    if message.startswith("@MGBot "):
+        # Logic for handling direct messages can go here
+        pass
