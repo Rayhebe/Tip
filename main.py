@@ -1,148 +1,188 @@
-from functions.mod import mods, vips, grant_mod, grant_vip, remove_vip
-from highrise import User, Position
+import random
+from highrise import *
+from highrise import BaseBot, Position
+from highrise.models import SessionMetadata
 
-class MGBot:
-    def __init__(self, highrise):
-        self.highrise = highrise
+casa = ["I Marry You 💍", "Of course I do 💍❤️", "I don't want to 💍💔", "Of course I don't 💍💔", "I Love You Of course I marry you 💍"]
+mods = ["RayMG", "sh1n1gam1699"]  # Add moderator usernames here
+vips = []  # Add VIP usernames here
 
-    async def command_handler(self, user: User, message: str):
-        parts = message.split(" ")
-        command = parts[0][1:].lower()  # Get the command after the prefix (!)
+class Bot(BaseBot):
+    async def on_start(self, session_metadata: SessionMetadata) -> None:
+        print("Bot is working")
+        await self.highrise.walk_to(Position(3.0, 0.25, 1.5, "FrontRight"))
 
-        # Heart reaction handling
-        if command.startswith("heart"):
-            await self.handle_reaction(user, parts, "heart")
+    async def on_user_join(self, user: User, position: Position | AnchorPosition) -> None:
+        print(f"{user.username} entered the room")
+        await self.highrise.send_whisper(user.id, f"❤️Welcome [{user.username}] Use: [!emote list] or [1-97] For Dances & Emotes")
+        await self.highrise.send_whisper(user.id, f"❤️Use: [/help] For More Information.")
+        await self.highrise.send_whisper(user.id, f"❤️.🤍.")
+        await self.highrise.send_emote("dance-hipshake")
+        await self.highrise.send_emote("emote-lust", user.id)
 
-        # Clap reaction handling
-        elif command.startswith("clap"):
-            await self.handle_reaction(user, parts, "clap")
+    async def on_chat(self, user: User, message: str) -> None:
+        print(f"{user.username}: {message}")
+
+        # Clap reaction logic with specified number of claps
+        if message.lower().startswith("clap"):
+            parts = message.split("@")
+
+            if len(parts) == 1:  # No @username, just "clap" command (self clap)
+                await self.clap(user, user, 1)  # Default 1 clap for self
+
+            elif parts[1].strip().lower().startswith("all"):  # "clap@all <number>"
+                await self.clap_for_all(user, parts)
+
+            else:  # "clap@<username> <number>"
+                await self.clap_for_user(user, parts)
+
+        # Heart reaction logic
+        elif message.lower().startswith("heart"):
+            parts = message.split("@")
+
+            if len(parts) == 1:  # No @username, just "heart" command (self heart)
+                await self.heart(user, user, 1)  # Default 1 heart for self
+
+            elif parts[1].strip().lower().startswith("all"):  # "heart@all <number>"
+                await self.heart_for_all(user, parts)
+
+            else:  # "heart@<username> <number>"
+                await self.heart_for_user(user, parts)
 
         # Moderation commands for mods
         if user.username in mods:
-            if command == "mod" and len(parts) == 2:
-                target_user_id = parts[1]
-                target_username = await self.get_username_by_id(target_user_id)
-                response = await grant_mod(target_user_id, target_username)
-                await self.highrise.chat(response)
+            if message.startswith("!mod "):
+                await self.handle_mod_commands(user, message)
 
-            elif command == "kick" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.kick_user(user, target_user_id)
+            elif message.startswith("!kick "):
+                await self.kick_user(user, message)
 
-            elif command == "ban" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.ban_user(user, target_user_id)
+            elif message.startswith("!ban "):
+                await self.ban_user(user, message)
 
-            elif command == "mute" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.mute_user(user, target_user_id)
+            elif message.startswith("!mute "):
+                await self.mute_user(user, message)
 
-            elif command == "summon" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.summon_user(user, target_user_id)
+            elif message.startswith("!summon "):
+                await self.summon_user(user, message)
 
-            elif command == "vip" and len(parts) == 2:
-                target_user_id = parts[1]
-                target_username = await self.get_username_by_id(target_user_id)
-                response = await grant_vip(target_user_id, target_username)
-                await self.highrise.chat(response)
-
-            elif command == "vipremove" and len(parts) == 2:
-                target_user_id = parts[1]
-                target_username = await self.get_username_by_id(target_user_id)
-                response = await remove_vip(target_user_id, target_username)
-                await self.highrise.chat(response)
-
-        # If the user is a VIP, allow only the summon command
-        elif user.username in vips:
-            if command == "summon" and len(parts) == 2:
-                target_user_id = parts[1]
-                await self.summon_user(user, target_user_id)
-            else:
-                await self.highrise.chat(f"Sorry, {user.username}, you do not have permission to use this command.")
-
-        else:
-            await self.highrise.chat(f"Sorry, {user.username}, you do not have permission to use this command.")
-
-    async def handle_reaction(self, user: User, parts: list, reaction_type: str):
-        if len(parts) == 2 and "@" in parts[1]:
-            target_username = parts[1][1:]  # Remove '@'
-            target_user_id = await self.get_user_id(target_username)
-            if target_user_id:
-                await self.highrise.react(reaction_type, target_user_id)
-                await self.highrise.chat(f"Sent a {reaction_type} to {target_username}")
-            else:
-                await self.highrise.chat("User not found.")
-        elif len(parts) == 3 and user.username in mods + ["RayMG", "sh1n1gam1699"]:
-            target_username = parts[1][1:]
-            target_user_id = await self.get_user_id(target_username)
-            amount = int(parts[2])
-
-            if target_user_id and amount <= 30:
-                for _ in range(amount):
-                    await self.highrise.react(reaction_type, target_user_id)
-                await self.highrise.chat(f"Sent {amount} {reaction_type}s to {target_username}")
-            else:
-                await self.highrise.chat("Invalid amount or user not found.")
-        else:
-            await self.highrise.chat(f"Usage: !{reaction_type}@user.id or !{reaction_type}@user.id [1-30]")
-
-    async def kick_user(self, user: User, target_user_id: str):
-        try:
-            await self.highrise.moderate_room(target_user_id, "kick")
+    async def handle_mod_commands(self, user: User, message: str):
+        parts = message.split(" ")
+        if len(parts) == 2:
+            target_user_id = parts[1]
             target_username = await self.get_username_by_id(target_user_id)
-            await self.highrise.chat(f"{target_username} has been kicked from the room!")
-        except Exception as e:
-            await self.highrise.chat(f"Error while kicking: {e}")
+            if target_username:
+                # Grant mod logic can be placed here
+                await self.highrise.chat(f"{target_username} has been granted mod status.")
 
-    async def ban_user(self, user: User, target_user_id: str):
-        try:
-            await self.highrise.moderate_room(target_user_id, "ban")
+    async def kick_user(self, user: User, message: str) -> None:
+        parts = message.split(" ")
+        if len(parts) == 2:
+            target_user_id = parts[1]
             target_username = await self.get_username_by_id(target_user_id)
-            await self.highrise.chat(f"{target_username} has been banned from the room!")
-        except Exception as e:
-            await self.highrise.chat(f"Error while banning: {e}")
+            if target_username:
+                await self.highrise.moderate_room(target_user_id, "kick")
+                await self.highrise.chat(f"{target_username} has been kicked from the room!")
 
-    async def mute_user(self, user: User, target_user_id: str):
-        target_username = await self.get_username_by_id(target_user_id)
-        await self.highrise.chat(f"{target_username} has been muted!")
+    async def ban_user(self, user: User, message: str) -> None:
+        parts = message.split(" ")
+        if len(parts) == 2:
+            target_user_id = parts[1]
+            target_username = await self.get_username_by_id(target_user_id)
+            if target_username:
+                await self.highrise.moderate_room(target_user_id, "ban")
+                await self.highrise.chat(f"{target_username} has been banned from the room!")
 
-    async def summon_user(self, user: User, target_user_id: str):
-        """Summon a user to the position of the current user"""
-        try:
+    async def mute_user(self, user: User, message: str) -> None:
+        parts = message.split(" ")
+        if len(parts) == 2:
+            target_user_id = parts[1]
+            target_username = await self.get_username_by_id(target_user_id)
+            await self.highrise.chat(f"{target_username} has been muted!")
+
+    async def summon_user(self, user: User, message: str) -> None:
+        parts = message.split(" ")
+        if len(parts) == 2:
+            target_user_id = parts[1]
             room_users = (await self.highrise.get_room_users()).content
-            requester_position = None
-            for room_user, position in room_users:
-                if room_user.id == user.id:
-                    requester_position = position
-                    break
-
-            for room_user, position in room_users:
+            for room_user, pos in room_users:
                 if room_user.id == target_user_id:
-                    await self.teleport(room_user, Position(requester_position.x, requester_position.y, requester_position.z + 1, requester_position.facing))
+                    await self.teleport(room_user, Position(3.0, 0.25, 1.5, "FrontRight"))
                     await self.highrise.chat(f"Summoned {room_user.username} to your position.")
                     break
-        except Exception as e:
-            await self.highrise.chat(f"Error while summoning: {e}")
 
-    async def teleport(self, user: User, position: Position):
-        try:
-            await self.highrise.teleport(user.id, position)
-        except Exception as e:
-            await self.highrise.chat(f"Teleport Error: {e}")
+    async def clap_for_all(self, user: User, parts: list) -> None:
+        room_users = await self.highrise.get_room_users()
+        room_user = next((ru for ru, _ in room_users.content if ru.id == user.id), None)
 
-    async def get_username_by_id(self, user_id: str) -> str:
-        """Retrieve the username based on the user ID"""
-        room_users = (await self.highrise.get_room_users()).content
-        for room_user, pos in room_users:
-            if room_user.id == user_id:
-                return room_user.username
-        return None
+        if room_user and (room_user.is_host or room_user.is_moderator):
+            num_claps = 1
+            if len(parts) > 1 and parts[1].strip().lower().split(" ")[-1].isdigit():
+                num_claps = int(parts[1].strip().lower().split(" ")[-1])
 
-    async def get_user_id(self, username: str) -> str:
-        """Retrieve the user ID based on the username"""
-        room_users = (await self.highrise.get_room_users()).content
-        for room_user, _ in room_users:
-            if room_user.username.lower() == username.lower():
-                return room_user.id
-        return None
+            for room_user, _ in room_users.content:
+                await self.clap(user, room_user, num_claps)
+
+            await self.highrise.chat(f"{user.username} clapped for everyone {num_claps} times!")
+        else:
+            await self.highrise.chat("Only the host or a moderator can clap for everyone.")
+
+    async def clap_for_user(self, user: User, parts: list) -> None:
+        target_username = parts[1].split(" ")[0].strip()  # Get the target username
+        num_claps = 1  # Default to 1 clap
+
+        if len(parts[1].split(" ")) > 1:  # If a number of claps is specified
+            try:
+                num_claps = int(parts[1].split(" ")[1].strip())
+            except ValueError:
+                await self.highrise.chat("Invalid number of claps.")
+                return
+
+        room_users = await self.highrise.get_room_users()
+        target_user = None
+
+        # Find the specified user in the room
+        for room_user, _ in room_users.content:
+            if room_user.username.lower() == target_username.lower():
+                target_user = room_user
+                break
+
+        if target_user:
+            await self.clap(user, target_user, num_claps)
+            await self.highrise.chat(f"{user.username} clapped for {target_user.username} {num_claps} times!")
+        else:
+            await self.highrise.chat(f"User '{target_username}' not found in the room.")
+
+    async def heart_for_all(self, user: User, parts: list) -> None:
+        room_users = await self.highrise.get_room_users()
+        room_user = next((ru for ru, _ in room_users.content if ru.id == user.id), None)
+
+        if room_user and (room_user.is_host or room_user.is_moderator):
+            num_hearts = 1
+            if len(parts) > 1 and parts[1].strip().lower().split(" ")[-1].isdigit():
+                num_hearts = int(parts[1].strip().lower().split(" ")[-1])
+
+            for room_user, _ in room_users.content:
+                await self.heart(user, room_user, num_hearts)
+
+            await self.highrise.chat(f"{user.username} sent hearts to everyone {num_hearts} times!")
+        else:
+            await self.highrise.chat("Only the host or a moderator can send hearts for everyone.")
+
+    async def heart_for_user(self, user: User, parts: list) -> None:
+        target_username = parts[1].split(" ")[0].strip()  # Get the target username
+        num_hearts = 1  # Default to 1 heart
+
+        if len(parts[1].split(" ")) > 1:  # If a number of hearts is specified
+            try:
+                num_hearts = int(parts[1].split(" ")[1].strip())
+            except ValueError:
+                await self.highrise.chat("Invalid number of hearts.")
+                return
+
+        room_users = await self.highrise.get_room_users()
+        target_user = None
+
+        # Find the specified user in the room
+        for room_user, _ in room_users.content:
+            if room_user.username.lower() == target_username.lower
