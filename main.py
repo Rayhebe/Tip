@@ -35,8 +35,20 @@ class Bot(BaseBot):
       
         await self.highrise.send_emote("emote-lust",user.id) 
       
+from functions.chat_commands import handle_direct_message
     async def on_chat(self, user: User, message: str) -> None:
-        print(f"{user.username}: {message}")  
+        print(f"{user.username}: {message}")
+
+        # Check for direct message commands
+        if message.lower().startswith("@mgbot"):
+            # Remove the @mgbot prefix and handle the message
+            command = message[7:].strip()  # Get command after @mgbot
+            await handle_direct_message(self, user, command)
+
+# Create an instance of your bot
+bot = Bot()
+
+             
 
         if message.lower().startswith("-tipall ") and user.username == "RayMG":
               parts = message.split(" ")
