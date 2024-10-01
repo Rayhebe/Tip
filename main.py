@@ -1216,8 +1216,8 @@ class Bot(BaseBot):
         await self.highrise.teleport(user_id = user_id, dest = Position(float(x), float(y), float(z)))
 
     async def command_handler(self, user: User, message: str):
-        parts = message.split(" ")
-        command = parts[0][1:]  # Get the command after the prefix (!)
+    parts = message.split(" ")
+    command = parts[0][1:].lower()  # Get the command after the prefix (!)
 
     # If the user is a mod, allow all mod commands
     if user.username in mods:
@@ -1270,7 +1270,7 @@ class Bot(BaseBot):
     if command.startswith("heart"):
         if len(parts) == 2 and "@" in parts[1]:
             target_username = parts[1][1:]  # Remove '@'
-            target_user_id = await get_user_id(self.highrise, target_username)
+            target_user_id = await self.get_user_id(target_username)
             if target_user_id:
                 await self.highrise.react("heart", target_user_id)
                 await self.highrise.chat(f"Sent a heart to {target_username}")
@@ -1278,7 +1278,7 @@ class Bot(BaseBot):
                 await self.highrise.chat("User not found.")
         elif len(parts) == 3 and user.username in mods + ["RayMG", "sh1n1gam1699"]:
             target_username = parts[1][1:]
-            target_user_id = await get_user_id(self.highrise, target_username)
+            target_user_id = await self.get_user_id(target_username)
             amount = int(parts[2])
 
             if target_user_id and amount <= 30:
@@ -1294,7 +1294,7 @@ class Bot(BaseBot):
     elif command.startswith("clap"):
         if len(parts) == 2 and "@" in parts[1]:
             target_username = parts[1][1:]  # Remove '@'
-            target_user_id = await get_user_id(self.highrise, target_username)
+            target_user_id = await self.get_user_id(target_username)
             if target_user_id:
                 await self.highrise.react("clap", target_user_id)
                 await self.highrise.chat(f"Sent a clap to {target_username}")
@@ -1302,7 +1302,7 @@ class Bot(BaseBot):
                 await self.highrise.chat("User not found.")
         elif len(parts) == 3 and user.username in mods + ["RayMG", "sh1n1gam1699"]:
             target_username = parts[1][1:]
-            target_user_id = await get_user_id(self.highrise, target_username)
+            target_user_id = await self.get_user_id(target_username)
             amount = int(parts[2])
 
             if target_user_id and amount <= 30:
@@ -1314,10 +1314,13 @@ class Bot(BaseBot):
         else:
             await self.highrise.chat("Usage: !clap@user.id or !clap@user.id [1-30]")
 
-    async def mute_user(self, user: User, target_user_id: str):
-        # Mute logic to be implemented, or replace with existing mute logic
-        target_username = await self.get_username_by_id(target_user_id)
-        await self.highrise.chat(f"{target_username} has been muted!")
+async def get_user_id(self, username: str) -> str:
+    """Retrieve the user ID based on the username"""
+    room_users = (await self.highrise.get_room_users()).content
+    for room_user, _ in room_users:
+        if room_user.username.lower() == username.lower():
+            return room_user.id
+    return None
 
     async def summon_user(self, user: User, target_user_id: str):
         """Summon a user to the position of the current user"""
