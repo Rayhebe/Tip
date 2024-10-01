@@ -1,9 +1,13 @@
 from highrise import BaseBot, User
 
-class ChatCommands:
-    @staticmethod
-    async def handle_whisper(bot: BaseBot, user: User, message: str) -> None:
-        # Extract the message part after the "/whisper" command
-        broadcast_message = message[len("/whisper "):].strip()
-        # Send the broadcast message as if the bot itself is speaking
-        await bot.highrise.chat(f"{bot.bot_name} says: {broadcast_message}")
+async def handle_whisper(bot: BaseBot, user: User, message: str) -> None:
+    """
+    Handle the /whisper command by sending the message to the room publicly.
+    The original whisper command message will not be displayed in the chat log.
+    """
+    if message.lower().startswith("/whisper"):
+        # Extract the message after the command
+        secret_message = message[len("/whisper "):].strip()
+        
+        # Send the message to the room
+        await bot.highrise.chat(secret_message)
