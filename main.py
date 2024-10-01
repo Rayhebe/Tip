@@ -38,7 +38,6 @@ class Bot(BaseBot):
       
     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")  
-                     
         # Debugging: Check if message is received
         if message.lower().startswith("@mgbot"):
             print("Direct message received!")  # Debug line
@@ -46,10 +45,6 @@ class Bot(BaseBot):
             await handle_direct_message(self, user, command)  # Handle the message
         else:
             print("Message did not start with @mgbot.")
-
-# Create an instance of your bot
-bot = Bot()     
-
         if message.lower().startswith("-tipall ") and user.username == "RayMG":
               parts = message.split(" ")
               if len(parts) != 2:
