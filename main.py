@@ -1,55 +1,32 @@
-import random
-import os
-import importlib.util
-from highrise import*
-from highrise import BaseBot,Position
+from highrise import BaseBot, User, Position
 from highrise.models import SessionMetadata
 from functions.chat_commands import handle_direct_message
 
-casa = ["I Marry You 💍","Of course I do 💍❤️","I don't want to 💍💔","Of course I don't 💍💔","I Love You Of course I marry you 💍"]
-
-curativo = ["🔴You Used the Bandage Your Life Is at: 100%🔴","🔴You Used the Bandage Your Life is at: 50%🔴","🔴You Used the Bandage Your Life is at: 60%🔴","🔴You Used Your Life Bandage is at: 75% Your Life is at: 90%🔴","🔴You Used the Bandage It is at: 91%🔴"]
-         
-bomba = ["💣🧟‍♂️ You Threw a Bomb on 1x Boss Zombie 🧟‍♀️💣","💣🧟 You Threw a Bomb on 3x Boss Zombie 🧟💣","💣🧟‍♂️ You Threw a Bomb on 2x Boss Zombie 💣🧟‍♀️","💣 🧟‍♂️ You Threw a Bomb on 7x Boss Zombie 💣🧟‍♂️","💣🧟 You Threw a Bomb on 4x Boss Zombie 🧟💣"]
-
-facada = ["🧟🔪 You Stabbed 1x Zombie 🔪🧟","🧟🔪 You Stabbed 6x Zombie 🔪🧟","🧟🔪 You Stabbed 7x Zombie 🔪🧟","🧟‍♂️🔪🧟‍♂️ You Stabbed 8x Zombie 🔪🧟‍♂️","🧟 🔪 You Stabbed 10x Zombie 🔪🧟","🧟🔪 You Stabbed 9x Zombie 🔪🧟","🧟‍♀️🔪🧟‍♂️ You Stabbed 3x Zombie 🧟‍♂️🔪🧟‍♀️"]
-
-atirar = ["🧟You Shot 5x Zombie🧟","🧟You Shot 1x Zombie🧟","🧟You Shot 8x Zombie🧟","🧟You Shot 3x Zombie🧟","🧟‍♂️You Shot 5x Zombie🧟‍♂️ ","🧟‍♀️You Shot 10x Zombie🧟‍♀️","🧟🧟‍♀️You Shot 9x Zombie 🧟🧟‍♀️"]
-
-play = ["🔴Your Life is at 50% use : /bandage","🔴Your Life is at 20% use : /bandage","🔴Your Life is at 40% use : /bandage","🧟The Zombies Are Coming Use : /stab or /shoot","🧟🧟‍♂️ There Are Many Zombies 🧟‍♀️🧟 🛡 Use: /shield 🛡","🧟The Zombie Boss Is Coming Use: /bomb","🧟The Zombies Are Coming Use: /stab or/ shoot","🧟🧟‍♂️ There are Lots of Zombies 🧟‍♀️🧟 🛡 Use: /shield 🛡","🔴Your Life is at 60% use: /bandage","🔴Your Life is at 10% use: /bandage" ,"🧟The Zombies Are Coming Use : /stab or /shoot" ,"🧟The Zombies Are Coming Use : /stab or /shoot","🧟The Zombies Are Coming Use : /stab or /shoot","🧟The Zombies They're Coming Use : /stab or /shoot","🧟The Zombies Are Coming Use : /stab or /shoot","🧟The Zombies Are Coming Use : /stab or /shoot "]
-
-pescar = ["🥈YOU WON THE MEDAL: SILVER FISHERMAN🥈","🥉YOU WON THE MEDAL: BRONZE FISHERMAN🥉","🥉YOU WON THE MEDAL: BRONZE FISHERMAN🥉","🥉YOU WON THE MEDAL: BRONZE FISHERMAN🥉","🥉YOU WON OR THE MEDAL: BRONZE FISHERMAN🥉","🟡Event: /carp 🟡","⚫️You Fished 3x Night Moon⚫️(+150 POINTS)","⚫️You Fished 2x Night Moon⚫️(+100 POINTS)"," ⚫️You Fished 1x Night Moon⚫️(+50 POINTS)","🟡You Fished 1x Golden Shrimp 🟡 (MULTIPLE POINT)","🟡You Fished 1x Golden Flounder🟡 (MULTIPLE POINT)","🪼🌈You Fished 1x Octopus Rainbow🪼🌈 (EXTRA POINTS)","🐢You Caught 3x Turtle 🐢 (LOSS OF POINTS)","🦑You Caught 1x Giant Squid 🦑 (LEGENDARY)","🦀You Caught 6x Crab 🦀 (COMMON)", "🦀You Caught 2x Crab 🦀 (COMMON)","🦀You Caught 8x Crab 🦀 (COMMON)","🪼You Caught 1x Sea Octopus🪼(EPIC)","🦈You Caught 2x Shark🦈 (EPIC)", "🦈You Fished 5x Sharks🦈 (EPIC)","🦈You Fished 8x Sharks🦈 (EPIC)","🦈You Fished 1x Sharks🦈 (EPIC)","🐠You Fished 1x Sea Tuna🐠 (LEGENDARY)", "🐠You Caught 3x Clown Fish🐠 (LEGENDARIOUS)","🐠You Caught 3x Sea Tuna🐠 (LEGENDARIOUS)","🐠You Caught 1x Clown Fish🐠 (LEGENDARIOUS)","🐠You Caught 8x Clown Fish🐠 (LEGENDARY) )","🐠You Caught 10x Clown Fish🐠 (LEGENDARY)","🐟You Caught 1x Salmon🐟 (RARE)","🧜🏼‍♀️You Caught 5x Mermaid🧜🏼‍♀️(EPIC)","🧜🏼‍ ♀️You Caught 2x Mermaid🧜🏼‍♀️(EPIC)","🧜🏼‍♀️You Caught 1x Mermaid🧜🏼‍♀️(EPIC)","🐟You Caught 3x Salmon🐟 (RARE)","🟡You Caught 1 x Tilapia Dourada🟡 (MULTIPLE POINT)","☠️🐋You Caught 3x Dead Whale☠️🐋 (LOSS OF POINTS)","🐋You Caught 11x Sea Whale🐋(COMMON)","🐋🌈You Caught 1x Rainbow Whale🌈 🐋 (EXTRA POINTS)","🥈YOU WON THE MEDAL: SILVER FISHERMAN🥈","🥇YOU WON THE MEDAL: GOLD FISHERMAN🥇","🏅YOU WON THE MEDAL: STAR FISHERMAN🏅","💎Event: /shrimp 💎"]
-
 class Bot(BaseBot):
     async def on_start(self, session_metadata: SessionMetadata) -> None:
-        print("working")
-        await self.highrise.walk_to(Position(3.0 , 0.25 , 1.5, "FrontRight"))
-    async def on_user_join(self, user: User, position: Position | AnchorPosition) -> None:
-        print(f"{user.username} entrou na sala")   
-        await self.highrise.send_whisper(user.id,f"❤️Welcome [{user.username}] Use: [!emote list] or [1-97] For Dances & Emotes")
-
-        await self.highrise.send_whisper(user.id,f"❤️Use: [/help] For More Informations.")
-
-        await self.highrise.send_whisper(user.id,f"❤️.🤍.")
-           
+        print("Bot is online.")
+        await self.highrise.walk_to(Position(3.0, 0.25, 1.5, "FrontRight"))
+    
+    async def on_user_join(self, user: User, position: Position) -> None:
+        print(f"{user.username} joined the room.")
+        await self.highrise.send_whisper(user.id, f"❤️Welcome [{user.username}] Use: [!emote list] or [1-97] for dances and emotes.")
+        await self.highrise.send_whisper(user.id, "❤️Use: [/help] for more information.")
         await self.highrise.send_emote("dance-hipshake")
+        await self.highrise.send_emote("emote-lust", user.id)
       
-        await self.highrise.send_emote("emote-lust",user.id) 
-
     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")
-
-        # Check for direct message commands
-        if message.lower().startswith("@mgbot"):  # Check if the message starts with @mgbot
+        
+        # Debugging: Check if message is received
+        if message.lower().startswith("@mgbot"):
+            print("Direct message received!")  # Debug line
             command = message[7:].strip()  # Get command after @mgbot
-            await handle_direct_message(self, user, command)  # Call the direct message handler
+            await handle_direct_message(self, user, command)  # Handle the message
         else:
-            # Handle other chat messages if necessary
-            pass
+            print("Message did not start with @mgbot.")
 
 # Create an instance of your bot
 bot = Bot()
-
      async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")  
              
