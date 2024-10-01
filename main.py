@@ -11,13 +11,10 @@ casa = [
 class Bot(BaseBot):
     async def on_start(self, session_metadata: SessionMetadata) -> None:
         print("working")
-        await self.highrise.walk_to(Position(3.0, 0.25, 1.5, "FrontRight"))
+        await self.highrise.walk_to(Position(4.0, 0.26, 3.5, "FrontRight"))
 
     async def on_user_join(self, user: User, position: Position) -> None:
         print(f"{user.username} entrou na sala")
-        await self.highrise.send_whisper(user.id, f"❤️Welcome [{user.username}] Use: [!emote list] or [1-97] For Dances & Emotes")
-        await self.highrise.send_whisper(user.id, f"❤️Use: [/help] For More Information.")
-        await self.highrise.send_whisper(user.id, f"❤️.🤍.")
         await self.highrise.send_emote("dance-hipshake")
         await self.highrise.send_emote("emote-lust", user.id)
 
@@ -41,7 +38,7 @@ class Bot(BaseBot):
                 await self.clap_for_user(user, parts)
 
         # Moderation commands for mods
-        if user.username in ['RayMG', 'sh1n1gam', 'mod']:  # Adjust the mod list as needed
+        if user.username in ['RayMG', 'sh1n1gam1699', 'mod']:  # Adjust the mod list as needed
             if message.startswith("!kick "):
                 parts = message.split(" ")
                 if len(parts) == 2:
