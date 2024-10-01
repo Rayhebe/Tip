@@ -1,21 +1,33 @@
 import random
 from highrise import BaseBot, User, Position
 from highrise.models import SessionMetadata
-from functions.chat_commands import whisper_to_room
 
 class Bot(BaseBot):
     async def on_start(self, session_metadata: SessionMetadata) -> None:
-        print("Bot is working")
+        print("Bot started.")
         await self.highrise.walk_to(Position(4.0, 0.26, 3.5, "FrontRight"))
 
     async def on_user_join(self, user: User, position: Position) -> None:
         print(f"{user.username} joined the room.")
+        await self.highrise.send_emote("dance-hipshake")
 
     async def on_chat(self, user: User, message: str) -> None:
         print(f"{user.username}: {message}")
 
-        # Check if the message is a whisper command to the bot
-        if message.startswith(f"@{self.username}") or message.startswith("/whisper"):
-            # Extract the message after the bot's name or command
-            secret_message = message.split(" ", 1)[1] if " " in message else ""
-            await whisper_to_room(self, secret_message)
+        # Check if the message is a command directed to the bot
+        if message.startswith("@MGBot"):
+            # Remove the @MGBot part and handle the command
+            command_message = message[len("@MGBot"):].strip()
+            await self.handle_command(user, command_message)
+
+        # Check for /whisper command
+        elif message.startswith("/whisper"):
+            whisper_message = message[len("/whisper"):].strip()
+            await self.handle_command(user, whisper_message)
+
+    async def handle_command(self, user: User, command_message: str) -> None:
+        # Display the command message publicly in the room
+        if command_message:
+            await self.highrise.chat(command_message)
+
+# Assuming you have other necessary bot initialization here
