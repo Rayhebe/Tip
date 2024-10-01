@@ -4,6 +4,7 @@ import importlib.util
 from highrise import*
 from highrise import BaseBot,Position
 from highrise.models import SessionMetadata
+from functions.chat_commands import handle_direct_message
 
 casa = ["I Marry You 💍","Of course I do 💍❤️","I don't want to 💍💔","Of course I don't 💍💔","I Love You Of course I marry you 💍"]
 
