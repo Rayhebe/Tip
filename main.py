@@ -11,6 +11,7 @@ class Bot(BaseBot):
     async def on_start(self, session_metadata: SessionMetadata) -> None:
         try:
             logging.info("mgbot is online")
+            # You can remove the walk_to command if it causes issues
             await self.highrise.walk_to(Position(3.0, 0.25, 1.5, "FrontRight"))
         except Exception as e:
             logging.error(f"Error on start: {e}")
