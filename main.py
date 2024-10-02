@@ -1,18 +1,12 @@
-from highrise import (
-    BaseBot,
-    User,
-    SessionMetadata,
-)
+from highrise import BaseBot, User, SessionMetadata
 from highrise.models import Position
 from asyncio import run as arun
 
 class Bot(BaseBot):
     async def on_start(self, SessionMetadata: SessionMetadata) -> None:
-        print("Bot is starting...")
         try:
             await self.highrise.walk_to(Position(18., 0., .19, "FrontLeft"))
             await self.highrise.chat("LOADING...")
-            print("Bot has entered the room successfully.")
         except Exception as e:
             print(f"Error in on_start: {e}")
 
@@ -31,3 +25,8 @@ class Bot(BaseBot):
                 
         except Exception as e:
             print(f"Error in on_chat: {e}")
+
+if __name__ == "__main__":
+    room_id = "66d2726b2e80dd1f614c4dbb"  # Your room ID here
+    token = "432f23df3fc5076fe6c95ade994a533c9d473ecdb56acc31346899a94d6aaa6d"  # Your bot token here
+    arun(Bot().run(room_id, token))
