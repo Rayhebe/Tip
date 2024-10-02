@@ -14,6 +14,6 @@ if __name__ == "__main__":
 
     try:
         st.write("Running bot...")
-        arun(Bot().run(room_id, token))  # Start the bot
+        arun(Bot().start(room_id, token))  # Make sure this line matches the method defined in main.py
     except Exception as e:
         st.error(f"An error occurred while running the bot: {e}")
