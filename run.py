@@ -1,8 +1,9 @@
 from flask import Flask
 from threading import Thread
-from highrise.__main__ import *
+from asyncio import run as arun
 import time
-
+from importlib import import_module
+from highrise.__main__ import BotDefinition, main  # This should be correct
 
 class WebServer:
     def __init__(self):
@@ -10,7 +11,7 @@ class WebServer:
 
         @self.app.route('/')
         def index() -> str:
-            return "Funcionando"
+            return "Bot is running!"
 
     def run(self) -> None:
         self.app.run(host='0.0.0.0', port=8084)
@@ -19,7 +20,6 @@ class WebServer:
         t = Thread(target=self.run)
         t.start()
 
-
 class RunBot:
     room_id = "66d2726b2e80dd1f614c4dbb"
     bot_token = "202d7b11c3d00fe44e472d4c1b8ad9f4e3277e5fd03927d5cfab15532e9d8af8"
@@ -27,20 +27,26 @@ class RunBot:
     bot_class = "Bot"
 
     def __init__(self) -> None:
-        self.definitions = [
-            BotDefinition(
-                getattr(import_module(self.bot_file), self.bot_class)(),
-                self.room_id, self.bot_token
-            )
-        ]
+        try:
+            # Dynamically import the Bot class from main.py
+            bot_class = getattr(import_module(self.bot_file), self.bot_class)
+            self.definitions = [
+                BotDefinition(bot_class(), self.room_id, self.bot_token)
+            ]
+        except ImportError as e:
+            print(f"ImportError: {e}")
+        except AttributeError as e:
+            print(f"AttributeError: {e}")
+        except Exception as e:
+            print(f"Unexpected error during bot definition setup: {e}")
 
     def run_loop(self) -> None:
         while True:
             try:
                 arun(main(self.definitions))
             except Exception as e:
-                print("Error: ", e)
-                time.sleep(30)  # Increase the sleep time to avoid constant reconnects
+                print("Error running the bot: ", e)
+                time.sleep(5)
 
 if __name__ == "__main__":
     WebServer().keep_alive()
