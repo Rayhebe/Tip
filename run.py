@@ -9,8 +9,8 @@ class RunBot:
     def run_loop(self) -> None:
         while True:
             try:
-                # Create an instance of the Bot and start it
-                arun(Bot().start(self.room_id, self.bot_token))
+                # Create an instance of the Bot and run it
+                arun(Bot().run(self.room_id, self.bot_token))  # Change start to run
             except Exception as e:
                 print("Error: ", e)
                 time.sleep(5)
