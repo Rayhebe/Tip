@@ -7,4 +7,4 @@ def home():
     return "Bot is running!"
 
 def keep_alive():
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host="0.0.0.0", port=8080)  # Or whatever port you choose
