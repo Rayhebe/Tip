@@ -1,8 +1,6 @@
 from asyncio import run as arun
 import time
-from highrise import main  # Ensure this is the right import for running the bot
-from highrise import BotDefinition
-from main import Bot
+from main import Bot  # Import the Bot class from main.py
 
 class RunBot:
     room_id = "66d2726b2e80dd1f614c4dbb"  # Room ID
@@ -11,13 +9,10 @@ class RunBot:
     def run_loop(self) -> None:
         while True:
             try:
-                # Create an instance of the BotDefinition and pass it to the main method
-                bot_definitions = [
-                    BotDefinition(Bot(), self.room_id, self.bot_token)
-                ]
-                arun(main(bot_definitions))  # This should run the bot with the given definitions
+                # Create an instance of the Bot and start it
+                arun(Bot().start(self.room_id, self.bot_token))
             except Exception as e:
-                print("Error: ", e)
+                print(f"Error: {e}")
                 time.sleep(5)
 
 if __name__ == "__main__":
