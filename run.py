@@ -3,7 +3,7 @@ from threading import Thread
 from asyncio import run as arun
 import time
 from importlib import import_module
-from highrise.__main__ import BotDefinition, main  # This should be correct
+from highrise.__main__ import BotDefinition, main  # Ensure this import is correct
 
 class WebServer:
     def __init__(self):
@@ -35,12 +35,19 @@ class RunBot:
             ]
         except ImportError as e:
             print(f"ImportError: {e}")
+            self.definitions = None  # Ensure this is handled gracefully
         except AttributeError as e:
             print(f"AttributeError: {e}")
+            self.definitions = None
         except Exception as e:
             print(f"Unexpected error during bot definition setup: {e}")
+            self.definitions = None
 
     def run_loop(self) -> None:
+        if not self.definitions:
+            print("No bot definitions were initialized. Exiting.")
+            return  # Exit if there was an error during setup
+
         while True:
             try:
                 arun(main(self.definitions))
