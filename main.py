@@ -1241,6 +1241,15 @@ class Bot(BaseBot):
            
     async def on_whisper(self, user: User, message: str) -> None:
         print(f"{user.username} whispered: {message}")
+    # Check if the whisper message contains "mgbot"
+    if "mgbot" in message.lower():
+        # Remove the bot's name from the message and repeat the rest in the public room
+        actual_message = message.lower().replace("mgbot", "").strip()
+
+        # Bot repeats the message in the public room if there's something to say
+        if actual_message:
+            await self.highrise.send_message(actual_message)
+             
 
         if        message.startswith("/tele") or              message.startswith("/tp") or              message.startswith("/fly") or     message.startswith("!tele") or      message.startswith("!tp") or     message.startswith("!fly"):
           if user.username == "FallonXOXO" or user.username == "Its.Melly.Moo.XoXo" or user.username == "mghaa":
