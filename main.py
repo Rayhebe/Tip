@@ -7,12 +7,12 @@ from highrise.models import Position
 from asyncio import run as arun
 
 class Bot(BaseBot):
-
     async def on_start(self, SessionMetadata: SessionMetadata) -> None:
+        print("Bot is starting...")
         try:
             await self.highrise.walk_to(Position(18., 0., .19, "FrontLeft"))
             await self.highrise.chat("LOADING...")
-            print("Bot has entered the room successfully.")  # Log when the bot enters the room
+            print("Bot has entered the room successfully.")
         except Exception as e:
             print(f"Error in on_start: {e}")
 
@@ -28,16 +28,6 @@ class Bot(BaseBot):
                 user_message = message[len(f"@mgbot "):].strip()
                 # Send the message to the public room as if the user said it
                 await self.highrise.chat(f"{user.username}: {user_message}")
-                print(f"Command from {user.username}: {user_message}")  # Log commands
+                
         except Exception as e:
             print(f"Error in on_chat: {e}")
-
-    async def on_user_join(self, user: User) -> None:
-        print(f"{user.username} joined the room.")  # Log when a user joins
-
-if __name__ == "__main__":
-    from functions.webserver import keep_alive  # Adjust the path if necessary
-    keep_alive()  # Start the web server to keep the bot alive
-    room_id = "66d2726b2e80dd1f614c4dbb"  # Room ID here
-    token = "432f23df3fc5076fe6c95ade994a533c9d473ecdb56acc31346899a94d6aaa6d"  # Bot token here
-    arun(Bot().run(room_id, token))
