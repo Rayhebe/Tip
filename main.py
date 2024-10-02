@@ -5,7 +5,7 @@ from highrise import (
 )
 from highrise.models import Position
 from asyncio import run as arun
-from webserver import keep_alive
+from functions.webserver import keep_alive  # Updated import statement
 
 class Bot(BaseBot):
 
@@ -28,11 +28,12 @@ class Bot(BaseBot):
                 user_message = message[len(f"@mgbot "):].strip()
                 # Send the message to the public room as if the user said it
                 await self.highrise.chat(f"{user.username}: {user_message}")
-
+                
         except Exception as e:
             print(f"Error in on_chat: {e}")
 
 if __name__ == "__main__":
-    room_id = "66d2726b2e80dd1f614c4dbb"  # Your room ID here
-    token = "432f23df3fc5076fe6c95ade994a533c9d473ecdb56acc31346899a94d6aaa6d"  # Your token here
+    room_id = "66d2726b2e80dd1f614c4dbb"
+    token = "432f23df3fc5076fe6c95ade994a533c9d473ecdb56acc31346899a94d6aaa6d"
+    keep_alive()  # Start the web server
     arun(Bot().run(room_id, token))
