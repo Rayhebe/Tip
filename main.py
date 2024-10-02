@@ -5,15 +5,11 @@ from highrise.models import SessionMetadata
 class Bot(BaseBot):
     async def on_start(self, session_metadata: SessionMetadata) -> None:
         print("Bot is online")
-        # You can add more initialization code here if needed
+        # Move the bot to a specific position in the room if desired
         await self.highrise.walk_to(Position(3.0, 0.25, 1.5, "FrontRight"))
 
     async def on_user_message(self, user: User, message: str) -> None:
-        # Handle public messages if needed
-        pass
-
-    async def on_user_whisper(self, user: User, message: str) -> None:
-        # Check if the private message (whisper) contains "mgbot"
+        # Check if the direct message (chat) contains "mgbot"
         if "mgbot" in message.lower():
             # Remove the bot's name from the message and repeat the rest in the public room
             actual_message = message.lower().replace("mgbot", "").strip()
@@ -21,3 +17,7 @@ class Bot(BaseBot):
             # Bot repeats the message in the public room
             if actual_message:
                 await self.highrise.send_message(actual_message)
+
+    async def on_user_whisper(self, user: User, message: str) -> None:
+        # Optional: you can keep this if you want to handle whispers separately
+        pass
