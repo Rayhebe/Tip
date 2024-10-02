@@ -12,9 +12,7 @@ class Bot(BaseBot):
 
     async def on_chat(self, user: User, message: str):
         try:
-            # Define your bot ID and room ID
             _bid = "66be9396fdcc1589bbf8f297"  # Your bot user ID here
-            _rid = "66d2726b2e80dd1f614c4dbb"  # Your room ID here
 
             # Check if the message is a private message to the bot
             if message.lower().startswith(f"@mgbot"):
