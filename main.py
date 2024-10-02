@@ -1,5 +1,5 @@
 from highrise import BaseBot, User, SessionMetadata
-from highrise.models import Position
+from highrise.models import Position, Emote
 from asyncio import run as arun
 
 class Bot(BaseBot):
@@ -8,7 +8,15 @@ class Bot(BaseBot):
         await self.highrise.walk_to(Position(18., 0., .19, "FrontLeft"))
         await self.highrise.chat("LOADING...")
 
-    async def on_chat(self, user: User, message: str):
+    async def on_user_join(self, user: User) -> None:
+        try:
+            # React to the user joining the room with a heart emote
+            print(f"{user.username} has joined the room.")
+            await self.highrise.send_emote(user.id, Emote.HEART)
+        except Exception as e:
+            print(f"Error in on_user_join: {e}")
+
+    async def on_chat(self, user: User, message: str) -> None:
         try:
             _bid = "66be9396fdcc1589bbf8f297"  # Bot user ID
             _rid = "66d2726b2e80dd1f614c4dbb"  # Room ID
