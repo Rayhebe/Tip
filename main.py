@@ -27,5 +27,3 @@ class Bot(BaseBot):
                 
         except Exception as e:
             print(f"Error in on_chat: {e}")
-
-# No need to run the bot here, it will be managed by run.py
