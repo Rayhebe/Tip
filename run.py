@@ -1,5 +1,7 @@
 from asyncio import run as arun
 import time
+from highrise import main  # Ensure this is the right import for running the bot
+from highrise import BotDefinition
 from main import Bot
 
 class RunBot:
@@ -9,8 +11,11 @@ class RunBot:
     def run_loop(self) -> None:
         while True:
             try:
-                # Create an instance of the Bot and run it
-                arun(Bot().run(self.room_id, self.bot_token))  # Change start to run
+                # Create an instance of the BotDefinition and pass it to the main method
+                bot_definitions = [
+                    BotDefinition(Bot(), self.room_id, self.bot_token)
+                ]
+                arun(main(bot_definitions))  # This should run the bot with the given definitions
             except Exception as e:
                 print("Error: ", e)
                 time.sleep(5)
