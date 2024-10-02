@@ -1,36 +1,38 @@
-import os
-import logging
-from highrise import *
-from highrise import BaseBot, Position
-from highrise.models import SessionMetadata, User
-from functions.whisper_handler import handle_whisper  # Import the whisper handler function
+from highrise import (
+    BaseBot,
+    User,
+    SessionMetadata,
+)
+from highrise.models import Position
+from asyncio import run as arun
+from webserver import keep_alive
 
-# Set up logging to capture errors
-logging.basicConfig(level=logging.INFO)
-
-# Create the bot class
 class Bot(BaseBot):
-    # This method is triggered when the bot starts
-    async def on_start(self, session_metadata: SessionMetadata) -> None:
-        try:
-            logging.info("mgbot is online")
-            await self.highrise.walk_to(Position(3.0, 0.25, 1.5, "FrontRight"))  # Optional: Move to a position
-        except Exception as e:
-            logging.error(f"Error on start: {e}")
 
-    # This method handles whispers (private messages) sent to the bot
-    async def on_user_whisper(self, user: User, message: str) -> None:
+    async def on_start(self, SessionMetadata: SessionMetadata) -> None:
         try:
-            logging.info(f"Received whisper from {user.username}: {message}")
-            # Call the function to handle the whisper
-            await handle_whisper(user, message, self)  # Pass the bot instance to the handler
+            await self.highrise.walk_to(Position(18., 0., .19, "FrontLeft"))
+            await self.highrise.chat("LOADING...")
         except Exception as e:
-            logging.error(f"Error in whisper handling: {e}")
+            print(f"error : {e}")
 
-# Run the bot when the script is executed
+    async def on_chat(self, user: User, message: str):
+        try:
+            _bid = "66be9396fdcc1589bbf8f297"  # Your bot user ID here
+            _id = f"1_on_1:{_bid}:{user.id}"
+            _idx = f"1_on_1:{user.id}:{_bid}"
+            _rid = "66d2726b2e80dd1f614c4dbb"  # Your room ID here
+
+            # If the message starts with the bot's name, treat it as a command
+            if message.lower().startswith(f"@mgbot"):
+                user_message = message[len(f"@mgbot "):].strip()
+                # Send the message to the public room as if the user said it
+                await self.highrise.chat(f"{user.username}: {user_message}")
+
+        except Exception as e:
+            print(f"Error in on_chat: {e}")
+
 if __name__ == "__main__":
-    bot = Bot()
-    try:
-        bot.run()
-    except Exception as e:
-        logging.error(f"Error running the bot: {e}")
+    room_id = "66d2726b2e80dd1f614c4dbb"  # Your room ID here
+    token = "432f23df3fc5076fe6c95ade994a533c9d473ecdb56acc31346899a94d6aaa6d"  # Your token here
+    arun(Bot().run(room_id, token))
