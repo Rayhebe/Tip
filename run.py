@@ -1,10 +1,8 @@
-from highrise import BaseBot, User, SessionMetadata
-from highrise.models import Position
+from highrise import BaseBot
 from asyncio import run as arun
-import importlib.util
 import time
 
-# Assuming we have a Bot class in main.py
+# Import your Bot class from main.py
 from main import Bot
 
 class RunBot:
