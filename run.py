@@ -1,8 +1,5 @@
-from highrise import BaseBot
 from asyncio import run as arun
 import time
-
-# Import your Bot class from main.py
 from main import Bot
 
 class RunBot:
