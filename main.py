@@ -4,14 +4,14 @@ from highrise.models import Position
 class Bot(BaseBot):
     async def on_start(self, session_metadata: SessionMetadata) -> None:
         try:
-            # Bot walks to a specific position and sends a loading message
             await self.highrise.walk_to(Position(18.0, 0.0, 0.19, "FrontLeft"))
             await self.highrise.chat("LOADING...")
         except Exception as e:
             print(f"Error in on_start: {e}")
 
-    async def on_chat(self, user: User, message: str) -> None:
+    async def on_chat(self, user: User, message: str):
         try:
+            # Keep the bot and room IDs intact
             _bid = "66be9396fdcc1589bbf8f297"  # Your bot user ID here
             _rid = "66d2726b2e80dd1f614c4dbb"  # Your room ID here
             _id = f"1_on_1:{_bid}:{user.id}"
