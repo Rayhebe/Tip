@@ -23,20 +23,40 @@ class Bot(BaseBot):
     async def on_start(self, session_metadata: SessionMetadata) -> None:
         print("working")
         await self.highrise.walk_to(Position(3.0 , 0.25 , 1.5, "FrontRight"))
-    async def on_user_join(self, user: User, position: Position | AnchorPosition) -> None:
-        print(f"{user.username} entrou na sala")   
-        await self.highrise.send_whisper(user.id,f"❤️Welcome [{user.username}] Use: [!emote list] or [1-97] For Dances & Emotes")
 
-        await self.highrise.send_whisper(user.id,f"❤️Use: [/help] For More Informations.")
+    async def on_user_join(self, user: User) -> None:
+        try:
+            print(f"{user.username} entrou na sala")
+            
+            # Send welcome whispers
+            await self.highrise.send_whisper(user.id, f"❤️Welcome [{user.username}] Use: [!emote list] or [1-97] For Dances & Emotes")
+            await self.highrise.send_whisper(user.id, f"❤️Use: [/help] For More Informations.")
+            
+            # React to the user joining the room with a heart emote and public message
+            await self.highrise.react("heart", user.id)
+            await self.highrise.chat(f"{user.username} has joined the room! ❤️")
+            
+            # Send emotes to the user
+            await self.highrise.send_emote("dance-hipshake")
+            await self.highrise.send_emote("emote-lust", user.id)
+        except Exception as e:
+            print(f"Error in on_user_join: {e}")
 
-        await self.highrise.send_whisper(user.id,f"❤️.🤍.")
-           
-        await self.highrise.send_emote("dance-hipshake")
-      
-        await self.highrise.send_emote("emote-lust",user.id) 
-      
     async def on_chat(self, user: User, message: str) -> None:
-        print(f"{user.username}: {message}")  
+        try:
+            _bid = "66be9396fdcc1589bbf8f297"  # Bot user ID
+            _rid = "66d2726b2e80dd1f614c4dbb"  # Room ID
+            _id = f"1_on_1:{_bid}:{user.id}"
+            _idx = f"1_on_1:{user.id}:{_bid}"
+
+            # Check if the message is private and from RayMG or sh1n1gam1699
+            if user.username.lower() in ["raymg", "sh1n1gam1699"]:
+                if message.lower().startswith(f"@mghbot"):
+                    user_message = message[len(f"@mghbot "):].strip()
+                    # Broadcast the private message to the room
+                    await self.highrise.chat(f"{user.username}: {user_message}")
+        except Exception as e:
+            print(f"Error in on_chat: {e}")
 
         if message.lower().startswith("-tipall ") and user.username == "RayMG":
               parts = message.split(" ")
